@@ -28,5 +28,11 @@ exec openbox-session\n\
 COPY startup.sh /startup.sh
 RUN chmod +x /startup.sh
 
+COPY /dirbuster-words /dirbuster-words
+
 EXPOSE 6080
 CMD ["/startup.sh"]
+
+
+# docker build -t kali-container .
+# docker run -it -p 6080:6080 kali-container
