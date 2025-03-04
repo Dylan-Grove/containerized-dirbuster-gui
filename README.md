@@ -1,6 +1,6 @@
-# Containerized Dirbuster
+# Containerized Dirbuster GUI
  
-This project provides a Docker container that runs Dirbuster inside a fully containerized Kali Linux environment. It comes with:
+This project provides a Docker container that runs Dirbuster inside a fully containerized Kali Linux environment with a browser based GUI. It comes with:
  
 - A **Dockerfile** that builds a Kali Linux container.
 - A **startup script** (`startup.sh`) to launch a VNC server with noVNC for browser-based GUI access.
@@ -23,14 +23,14 @@ Dirbuster’s graphical interface is available via your browser so you can easil
 ## Quickstart
  
 1. **Build the Container:**  
-   Open the Dockerfile and copy the build command (shown below) and run it in your repository folder:
+   Copy the build command and run it in your repository folder:
    
-       ```docker build -t kali-container .```
+       ```docker build -t dirbuster-gui .```
  
 2. **Run the Container:**  
    Run the container with port mapping for noVNC:
    
-       ```docker run -it -p 6080:6080 kali-container```
+       ```docker run -it -p 6080:6080 dirbuster-gui```
  
 3. **Access the GUI:**  
    Open your browser and navigate to:  
@@ -53,47 +53,6 @@ Dirbuster’s graphical interface is available via your browser so you can easil
  ```
 ---
  
-## Dockerfile
- ```
-       FROM kalilinux/kali-rolling:latest
- 
-       RUN apt-get update && apt-get install -y \
-           dirbuster \
-           openbox \
-           tigervnc-standalone-server \
-           tigervnc-common \
-           novnc \
-           websockify \
-           xfonts-base
- 
-       # Fix the TigerVNC migration bug
-       RUN rm -rf /root/.vnc /root/.config/tigervnc && \
-           mkdir -p /root/.config/tigervnc && \
-           ln -s /root/.config/tigervnc /root/.vnc && \
-           chown -R root:root /root/.config && \
-           chmod -R 700 /root/.config
- 
-       # Write the xstartup script to launch Dirbuster and Openbox
-       RUN echo '#!/bin/sh\n\
-       xrdb $HOME/.Xresources\n\
-       dirbuster &\n\
-       exec openbox-session\n\
-       ' > /root/.vnc/xstartup && \
-           chmod +x /root/.vnc/xstartup
- 
-       # Copy startup script and wordlist folder into the container
-       COPY startup.sh /startup.sh
-       RUN chmod +x /startup.sh
-       COPY /dirbuster-words /dirbuster-words
- 
-       EXPOSE 6080
-       CMD ["/startup.sh"]
- 
-       # Build with: docker build -t kali-container .
-       # Run with:   docker run -it -p 6080:6080 kali-container
- ```
----
-
 ## startup.sh
  
 Make sure you have a `startup.sh` in your repository (it is copied into the container) that starts the VNC server and noVNC. For example:
